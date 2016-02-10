@@ -1,9 +1,8 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyCompany("Scarlet.Crush Productions")]
-[assembly: AssemblyCopyright("Copyright © Scarlet.Crush Productions 2012-2014, Benjamin Höglinger 2015")]
+[assembly: AssemblyCopyright("Copyright © Scarlet.Crush Productions 2012-2014, Benjamin Höglinger 2015-2016")]
 
 //[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
@@ -12,5 +11,5 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("1.6.226.15355")]
-[assembly: AssemblyFileVersion("1.6.226.15355")]
+[assembly: AssemblyVersion("1.6.252.16035")]
+[assembly: AssemblyFileVersion("1.6.252.16035")]

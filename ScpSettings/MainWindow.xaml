@@ -148,6 +148,11 @@
                                 Secure Simple Pairing was introduced in the Bluetooth 2.1 + EDR specification. It's used for pairing DualShock 4 controllers. On problems with 3rd party controllers this feature can be disabled.
                             </TextBlock>
                             <CheckBox IsChecked="{Binding Path=DisableSSP}">Disable Secure Simple Pairing</CheckBox>
+
+                            <TextBlock>
+                                By default, incoming HID Reports get processed and passed through to the virtual controllers in a synchronous, blocking manner. If you experience noticeable input lag you may try the "fire-and-forget"-approach by enabling the following option (Warning: might introduce alignment errors).
+                            </TextBlock>
+                            <CheckBox IsChecked="{Binding Path=UseAsyncHidReportProcessing}">Use asynchronous HID Report Processing</CheckBox>
                         </StackPanel>
                     </Grid>
                 </ScrollViewer>
@@ -340,24 +345,44 @@
 
             <!-- Service settings -->
             <controls:AccordionItem Header="Service settings">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
+                <ScrollViewer>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                    <GroupBox Header="Driver settings"
-                              Grid.Row="0">
-                        <StackPanel>
-                            <TextBlock>
-                                By checking one or more of the checkboxes below the service will check you device drivers on every start-up and re-applies the correct driver on your Bluetooth dongle or Usb-wired DualShock controllers to ensure proper communication with the software.
-                            </TextBlock>
-                            <CheckBox IsChecked="{Binding Path=ForceBluetoothDriverReinstallation}">Force Bluetooth driver installation</CheckBox>
-                            <CheckBox IsChecked="{Binding Path=ForceDs3DriverReinstallation}">Force DualShock 3 driver installation</CheckBox>
-                            <CheckBox IsChecked="{Binding Path=ForceDs4DriverReinstallation}">Force DualShock 4 driver installation</CheckBox>
-                        </StackPanel>
-                    </GroupBox>
+                        <GroupBox Header="Driver settings"
+                                  Grid.Row="0" Margin="0,0,0,10">
+                            <StackPanel>
+                                <TextBlock>
+                                    By checking one or more of the checkboxes below the service will check you device drivers on every start-up and re-applies the correct driver on your Bluetooth dongle or Usb-wired DualShock controllers to ensure proper communication with the software.
+                                </TextBlock>
+                                <CheckBox IsChecked="{Binding Path=ForceBluetoothDriverReinstallation}">Force Bluetooth driver installation</CheckBox>
+                                <CheckBox IsChecked="{Binding Path=ForceDs3DriverReinstallation}">Force DualShock 3 driver installation</CheckBox>
+                                <CheckBox IsChecked="{Binding Path=ForceDs4DriverReinstallation}">Force DualShock 4 driver installation</CheckBox>
+                            </StackPanel>
+                        </GroupBox>
 
-                </Grid>
+                        <GroupBox Header="Virtual Xbox 360 controller driver"
+                                  Grid.Row="1" Margin="0,0,0,10">
+                            <StackPanel>
+                                <TextBlock>
+                                    Ticking the box below will prevent the virtual bus from creating plug-in or unplug events. You typically want to leave this setting unchanged unless for test scenarios.
+                                </TextBlock>
+                                <CheckBox IsChecked="{Binding Path=IsVBusDisabled}">Disable Virtual Bus events</CheckBox>
+                                <TextBlock>
+                                    The default behavior of the virtual Xbox 360 controller device created by the virtual bus is to linger in a connected state even if the physical gamepad gets disconnected (turned off). If you'd like the virtual Xbox 360 controller to "disconnect" from the system when the physical pad gets shut off, tick the box below.
+                                </TextBlock>
+                                <CheckBox IsChecked="{Binding Path=AlwaysDisconnectVirtualBusDevice}">Always unplug virtual controller</CheckBox>
+                                <TextBlock>
+                                    Pads get assigned a slot number when connecting. By default, all four available XInput-slots will be occupied by connected DualShock controllers in an ascending order. If you have an environment with other XInput-compatible devices (like a Microsoft Xbox 360 controller), tick the box below so only empty slots will be used.
+                                </TextBlock>
+                                <CheckBox IsChecked="{Binding Path=SkipOccupiedSlots}">Skip occupied gamepad slots</CheckBox>
+                            </StackPanel>
+                        </GroupBox>
+                    </Grid>
+                </ScrollViewer>
             </controls:AccordionItem>
 
             <!-- Sound settings -->

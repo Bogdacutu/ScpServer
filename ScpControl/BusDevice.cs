@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using ScpControl.Profiler;
+using System.Runtime.InteropServices;
 using ScpControl.ScpCore;
 using ScpControl.Shared.Core;
 using ScpControl.Shared.Utilities;
+using ScpControl.Shared.XInput;
+using ScpControl.XInput;
 
 namespace ScpControl
 {
@@ -13,12 +15,12 @@ namespace ScpControl
         #region Private fields
 
         private const int BusWidth = 4;
-        private readonly List<int> m_Plugged = new List<int>();
-        private int m_Offset;
-        private DsState m_State = DsState.Disconnected;
+        private readonly List<int> _pluggedInDevices = new List<int>();
+        private int _busOffset;
+        private DsState _busState = DsState.Disconnected;
 
         #endregion
-
+        
         #region Public properties
 
         public static int ReportSize
@@ -38,7 +40,7 @@ namespace ScpControl
 
         public DsState State
         {
-            get { return m_State; }
+            get { return _busState; }
         }
 
         #endregion
@@ -59,33 +61,29 @@ namespace ScpControl
 
         #endregion
 
-        #region Private methods
+        #region Public methods
 
         /// <summary>
         ///     Translates Pad ID to bus device offset.
         /// </summary>
         /// <param name="index">The Pad ID to translate.</param>
         /// <returns>The bus device serial.</returns>
-        private int IndexToSerial(byte index)
+        public int IndexToSerial(byte index)
         {
-            return index + m_Offset + 1;
+            return index + _busOffset + 1;
         }
-
-        #endregion
-
-        #region Public methods
 
         public override bool Open(int instance = 0)
         {
             if (State == DsState.Disconnected)
             {
-                m_Offset = instance*BusWidth;
+                _busOffset = instance*BusWidth;
 
-                Log.DebugFormat("-- Bus Open: Offset {0}", m_Offset);
+                Log.DebugFormat("-- Bus Open: Offset {0}", _busOffset);
 
                 if (!base.Open(0))
                 {
-                    Log.ErrorFormat("-- Bus Open: Offset {0} failed", m_Offset);
+                    Log.ErrorFormat("-- Bus Open: Offset {0} failed", _busOffset);
                 }
             }
 
@@ -103,7 +101,7 @@ namespace ScpControl
                 if (GetDeviceHandle(Path))
                 {
                     IsActive = true;
-                    m_State = DsState.Reserved;
+                    _busState = DsState.Reserved;
                 }
             }
 
@@ -114,7 +112,7 @@ namespace ScpControl
         {
             if (State == DsState.Reserved)
             {
-                m_State = DsState.Connected;
+                _busState = DsState.Connected;
             }
 
             return State == DsState.Connected;
@@ -126,14 +124,14 @@ namespace ScpControl
             {
                 var Items = new Queue<int>();
 
-                lock (m_Plugged)
+                lock (_pluggedInDevices)
                 {
-                    foreach (var serial in m_Plugged) Items.Enqueue(serial - m_Offset);
+                    foreach (var serial in _pluggedInDevices) Items.Enqueue(serial - _busOffset);
                 }
 
                 while (Items.Count > 0) Unplug(Items.Dequeue());
 
-                m_State = DsState.Reserved;
+                _busState = DsState.Reserved;
             }
 
             return State == DsState.Reserved;
@@ -143,14 +141,14 @@ namespace ScpControl
         {
             if (base.Stop())
             {
-                m_State = DsState.Reserved;
+                _busState = DsState.Reserved;
             }
 
             if (State != DsState.Reserved)
             {
                 if (base.Close())
                 {
-                    m_State = DsState.Disconnected;
+                    _busState = DsState.Disconnected;
                 }
             }
 
@@ -327,42 +325,56 @@ namespace ScpControl
 
         public bool Plugin(int serial)
         {
+            if (GlobalConfiguration.Instance.IsVBusDisabled) return true;
+
             var retVal = false;
 
-            if (serial < 1 || serial > BusWidth) return retVal;
-
-            serial += m_Offset;
-
-            if (State == DsState.Connected)
+            if (GlobalConfiguration.Instance.SkipOccupiedSlots)
             {
-                lock (m_Plugged)
+                while (IsSerialOccupied(serial) && serial < BusWidth)
                 {
-                    if (!m_Plugged.Contains(serial))
-                    {
-                        var transfered = 0;
-                        var buffer = new byte[16];
-
-                        buffer[0] = 0x10;
-                        buffer[1] = 0x00;
-                        buffer[2] = 0x00;
-                        buffer[3] = 0x00;
-
-                        buffer[4] = (byte) ((serial >> 0) & 0xFF);
-                        buffer[5] = (byte) ((serial >> 8) & 0xFF);
-                        buffer[6] = (byte) ((serial >> 16) & 0xFF);
-                        buffer[7] = (byte) ((serial >> 24) & 0xFF);
-
-                        if (DeviceIoControl(FileHandle, 0x2A4000, buffer, buffer.Length, null, 0, ref transfered,
-                            IntPtr.Zero))
-                        {
-                            m_Plugged.Add(serial);
-                            retVal = true;
-
-                            Log.DebugFormat("-- Bus Plugin : Serial {0}", serial);
-                        }
-                    }
-                    else retVal = true;
+                    serial++;
                 }
+            }
+
+            if (serial < 1 || serial > BusWidth) return false;
+
+            serial += _busOffset;
+
+            if (State != DsState.Connected) return false;
+
+            lock (_pluggedInDevices)
+            {
+                if (!_pluggedInDevices.Contains(serial))
+                {
+                    var transfered = 0;
+                    var buffer = new byte[16];
+
+                    buffer[0] = 0x10;
+                    buffer[1] = 0x00;
+                    buffer[2] = 0x00;
+                    buffer[3] = 0x00;
+
+                    buffer[4] = (byte) ((serial >> 0) & 0xFF);
+                    buffer[5] = (byte) ((serial >> 8) & 0xFF);
+                    buffer[6] = (byte) ((serial >> 16) & 0xFF);
+                    buffer[7] = (byte) ((serial >> 24) & 0xFF);
+
+                    if (DeviceIoControl(FileHandle, 0x2A4000, buffer, buffer.Length, null, 0, ref transfered,
+                        IntPtr.Zero))
+                    {
+                        _pluggedInDevices.Add(serial);
+                        retVal = true;
+
+                        Log.DebugFormat("-- Bus Plugin : Serial {0}", serial);
+                    }
+                    else
+                    {
+                        Log.ErrorFormat("Couldn't plug in virtual device {0}: {1}", serial,
+                            new Win32Exception(Marshal.GetLastWin32Error()));
+                    }
+                }
+                else retVal = true;
             }
 
             return retVal;
@@ -370,39 +382,45 @@ namespace ScpControl
 
         public bool Unplug(int serial)
         {
+            if (GlobalConfiguration.Instance.IsVBusDisabled) return true;
+
             var retVal = false;
-            serial += m_Offset;
+            serial += _busOffset;
 
-            if (State == DsState.Connected)
+            if (State != DsState.Connected) return false;
+
+            lock (_pluggedInDevices)
             {
-                lock (m_Plugged)
+                if (_pluggedInDevices.Contains(serial))
                 {
-                    if (m_Plugged.Contains(serial))
+                    var transfered = 0;
+                    var buffer = new byte[16];
+
+                    buffer[0] = 0x10;
+                    buffer[1] = 0x00;
+                    buffer[2] = 0x00;
+                    buffer[3] = 0x00;
+
+                    buffer[4] = (byte) ((serial >> 0) & 0xFF);
+                    buffer[5] = (byte) ((serial >> 8) & 0xFF);
+                    buffer[6] = (byte) ((serial >> 16) & 0xFF);
+                    buffer[7] = (byte) ((serial >> 24) & 0xFF);
+
+                    if (DeviceIoControl(FileHandle, 0x2A4004, buffer, buffer.Length, null, 0, ref transfered,
+                        IntPtr.Zero))
                     {
-                        var transfered = 0;
-                        var buffer = new byte[16];
+                        _pluggedInDevices.Remove(serial);
+                        retVal = true;
 
-                        buffer[0] = 0x10;
-                        buffer[1] = 0x00;
-                        buffer[2] = 0x00;
-                        buffer[3] = 0x00;
-
-                        buffer[4] = (byte) ((serial >> 0) & 0xFF);
-                        buffer[5] = (byte) ((serial >> 8) & 0xFF);
-                        buffer[6] = (byte) ((serial >> 16) & 0xFF);
-                        buffer[7] = (byte) ((serial >> 24) & 0xFF);
-
-                        if (DeviceIoControl(FileHandle, 0x2A4004, buffer, buffer.Length, null, 0, ref transfered,
-                            IntPtr.Zero))
-                        {
-                            m_Plugged.Remove(serial);
-                            retVal = true;
-
-                            Log.DebugFormat("-- Bus Unplug : Serial {0}", serial);
-                        }
+                        Log.DebugFormat("-- Bus Unplug : Serial {0}", serial);
                     }
-                    else retVal = true;
+                    else
+                    {
+                        Log.ErrorFormat("Couldn't unplug virtual device {0}: {1}", serial,
+                            new Win32Exception(Marshal.GetLastWin32Error()));
+                    }
                 }
+                else retVal = true;
             }
 
             return retVal;
@@ -423,6 +441,21 @@ namespace ScpControl
             return
                 DeviceIoControl(FileHandle, 0x2A400C, input, input.Length, output, output.Length, ref transfered,
                     IntPtr.Zero) && transfered > 0;
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private static bool IsSerialOccupied(int serial)
+        {
+            if (--serial < 0 || serial > 3)
+            {
+                throw new ArgumentException(string.Format("Serial index ({0}) must be within range", serial));
+            }
+
+            var state = new XINPUT_STATE();
+            return (XInputNatives.XInputGetState((uint) serial, ref state) == ResultWin32.ERROR_SUCCESS);
         }
 
         #endregion

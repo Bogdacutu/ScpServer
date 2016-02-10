@@ -13,7 +13,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>b5436925</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>8a118610</NuGetPackageImportStamp>
     <AssemblyInfoFilePath>Properties\CommonInfo.cs</AssemblyInfoFilePath>
     <UpdateAssemblyVersion>True</UpdateAssemblyVersion>
     <UpdateAssemblyFileVersion>True</UpdateAssemblyFileVersion>
@@ -23,7 +23,8 @@
     <AssemblyInfoVersionSettings>
     </AssemblyInfoVersionSettings>
     <PrimaryVersionType>AssemblyVersionAttribute</PrimaryVersionType>
-    <AssemblyVersion>1.6.226.15355</AssemblyVersion>
+    <AssemblyVersion>1.6.252.16035</AssemblyVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -47,12 +48,8 @@
   </PropertyGroup>
   <PropertyGroup />
   <ItemGroup>
-    <Reference Include="CSScriptLibrary">
-      <HintPath>..\packages\CS-Script.3.9.17.0\lib\net45\CSScriptLibrary.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="DBreeze, Version=1.72.2015.827, Culture=neutral, PublicKeyToken=174b57f1c155f3c6, processorArchitecture=MSIL">
-      <HintPath>..\packages\DBreeze.1.72.0\lib\net45\DBreeze.dll</HintPath>
+    <Reference Include="DBreeze, Version=1.73.2016.108, Culture=neutral, PublicKeyToken=174b57f1c155f3c6, processorArchitecture=MSIL">
+      <HintPath>..\packages\DBreeze.1.73.0\lib\net45\DBreeze.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="HidSharp, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -63,20 +60,17 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Libarius.1.14.1\lib\Libarius.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=1.2.14.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\log4net.2.0.4\lib\net45-full\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="MadMilkman.Ini, Version=1.0.5.0, Culture=neutral, PublicKeyToken=4e0b5157a7ffbb74, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MadMilkman.Ini.1.0.5.0\lib\net20\MadMilkman.Ini.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Mono.CSharp">
-      <HintPath>..\packages\CS-Script.3.9.17.0\lib\net45\Mono.CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationFramework" />
@@ -169,7 +163,6 @@
     <Compile Include="Driver\Devcon.cs" />
     <Compile Include="Driver\Difx.cs" />
     <Compile Include="Driver\DriverInstaller.cs" />
-    <Compile Include="Driver\LibusbKWrapper.cs" />
     <Compile Include="Driver\NativeLibraryWrapper.cs" />
     <Compile Include="Driver\PNPUtilLib\DriverStoreEntry.cs" />
     <Compile Include="Driver\PNPUtilLib\IDriverStore.cs" />
@@ -177,11 +170,6 @@
     <Compile Include="Driver\WdiWrapper.cs" />
     <Compile Include="Driver\WinUsbWrapper.cs" />
     <Compile Include="Exceptions\RootHubAlreadyStartedException.cs" />
-    <Compile Include="Plugins\IScpMapperProfile.cs" />
-    <Compile Include="Plugins\Mapper\RetroArchProfile.script.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="Plugins\ScpMapperPlugins.cs" />
     <Compile Include="Profiler\DualShockProfileManager.cs" />
     <Compile Include="Profiler\VirtualMouse.cs" />
     <Compile Include="Properties\CommonInfo.cs" />
@@ -193,7 +181,6 @@
     <Compile Include="Rx\IChannel.cs" />
     <Compile Include="Rx\ScpNativeFeedChannel.cs" />
     <Compile Include="ScpCore\SingletonBase.cs" />
-    <Compile Include="Scripting.cs" />
     <Compile Include="Sound\AudioPlayer.cs" />
     <Compile Include="Usb\Gamepads\UsbBadBigBenGamepad.cs">
       <SubType>Component</SubType>
@@ -213,6 +200,9 @@
     <Compile Include="Usb\Ds3\Replica\UsbDs3QuadStick.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Usb\Gamepads\UsbMadcatzTournamentEdition2Fightstick.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Usb\Gamepads\UsbShanWanWirelessGamepad.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -222,6 +212,8 @@
     <Compile Include="Usb\Gamepads\UsbBlankGamepad.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Usb\PnP\UsbNotifier.cs" />
+    <Compile Include="Usb\PnP\Win32Usb.cs" />
     <Compile Include="Usb\UsbHub.3rdPartyFixes.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -240,6 +232,7 @@
     <Compile Include="Utilities\PortableSettingsProvider.cs" />
     <Compile Include="Utilities\TaskQueue.cs" />
     <Compile Include="Value Converters\EnumDescriptionConverter.cs" />
+    <Compile Include="Value Converters\MultiCheckedToEnabledConverter.cs" />
     <Compile Include="Value Converters\RadioBoolToIntConverter.cs" />
     <Compile Include="Wcf\IScpCommandService.cs" />
     <Compile Include="ScpCore\GlobalConfiguration.cs" />
@@ -311,6 +304,7 @@
     <Compile Include="Utilities\OsInfoHelper.cs" />
     <Compile Include="Utilities\StringExtensions.cs" />
     <Compile Include="Utilities\ThemeUtil.cs" />
+    <Compile Include="XInput\XInputNatives.cs" />
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
@@ -363,18 +357,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Libarius.XML" />
-    <Content Include="libusbK\amd64\libusb0.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="libusbK\amd64\libusbK.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="libusbK\x86\libusb0.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="libusbK\x86\libusbK.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="libwdi\amd64\libwdi.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -396,22 +378,10 @@
     <Content Include="System\ScpVBus.inf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xbox360\driver\vista_xp\x64\wdfcoinstaller01007.dll">
+    <Content Include="libwdi\amd64\wdi-simple.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xbox360\driver\vista_xp\x86\wdfcoinstaller01007.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Xbox360\driver\vista_xp\xusb21.inf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Xbox360\driver\win7\x64\wdfcoinstaller01009.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Xbox360\driver\win7\x86\wdfcoinstaller01009.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Xbox360\driver\win7\xusb21.inf">
+    <Content Include="libwdi\x86\wdi-simple.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -421,7 +391,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="ScpControlClassDiagram.cd" />
     <None Include="packages.config" />
     <None Include="ScpControl.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -435,24 +404,6 @@
     <None Include="System\x86\ScpVBus.sys">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="Xbox360\driver\vista_xp\x64\xusb21.sys">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Xbox360\driver\vista_xp\x86\xusb21.sys">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Xbox360\driver\vista_xp\xusb21.cat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Xbox360\driver\win7\x64\xusb21.sys">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Xbox360\driver\win7\x86\xusb21.sys">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Xbox360\driver\win7\xusb21.cat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ScpControl.Shared\ScpControl.Shared.csproj">
@@ -466,12 +417,12 @@
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets" Condition="Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" />
+  <Import Project="..\packages\Fody.1.29.4\build\portable-net+sl+win+wpa+wp\Fody.targets" Condition="Exists('..\packages\Fody.1.29.4\build\portable-net+sl+win+wpa+wp\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.3\build\portable-net+sl+win+wpa+wp\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\Fody.1.29.4\build\portable-net+sl+win+wpa+wp\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.4\build\portable-net+sl+win+wpa+wp\Fody.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

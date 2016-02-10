@@ -556,5 +556,56 @@ namespace ScpControl.Properties {
                 this["IsPressureSensitivityModEnabled"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(ScpControl.Utilities.PortableSettingsProvider))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsVBusDisabled {
+            get {
+                return ((bool)(this["IsVBusDisabled"]));
+            }
+            set {
+                this["IsVBusDisabled"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(ScpControl.Utilities.PortableSettingsProvider))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AlwaysDisconnectVirtualBusDevice {
+            get {
+                return ((bool)(this["AlwaysDisconnectVirtualBusDevice"]));
+            }
+            set {
+                this["AlwaysDisconnectVirtualBusDevice"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(ScpControl.Utilities.PortableSettingsProvider))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SkipOccupiedSlots {
+            get {
+                return ((bool)(this["SkipOccupiedSlots"]));
+            }
+            set {
+                this["SkipOccupiedSlots"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseAsyncHidReportProcessing {
+            get {
+                return ((bool)(this["UseAsyncHidReportProcessing"]));
+            }
+            set {
+                this["UseAsyncHidReportProcessing"] = value;
+            }
+        }
     }
 }

@@ -1,6 +1,8 @@
 # ScpToolkit
 Windows Driver and XInput Wrapper for Sony DualShock 3/4 Controllers
 
+[![Join the chat at https://gitter.im/nefarius/ScpToolkit](https://badges.gitter.im/nefarius/ScpServer.svg)](https://gitter.im/nefarius/ScpServer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## Credits
 ### Community
  * Major props to [original author Scarlet.Crush](http://forums.pcsx2.net/User-Scarlet-Crush) for developing this awesome toolkit!
@@ -29,6 +31,8 @@ Windows Driver and XInput Wrapper for Sony DualShock 3/4 Controllers
  * [AutoDependencyProperty.Fody](http://blog.angeloflogic.com/2014/12/no-more-dependencyproperty-with.html)
  * [LoadAssembliesOnStartup](https://github.com/Fody/LoadAssembliesOnStartup)
  * [Costura](https://github.com/Fody/Costura/)
+ * [DBreeze NoSql embedded object DBMS](https://dbreeze.codeplex.com/)
+ * [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 
 ## Installation requirements
  * Microsoft Windows Vista/7/8/8.1/10 x86 or amd64
@@ -43,7 +47,7 @@ Windows Driver and XInput Wrapper for Sony DualShock 3/4 Controllers
 
 ### Optional
  * A supported Bluetooth 2.0 (or higher) compatible USB dongle **with EDR** (**E**nhanced **D**ata **R**ate)
-  * See [**Compatible Bluetooth Devices**](https://github.com/nefarius/ScpServer/wiki/Compatible-Bluetooth-Devices)
+  * See [**Compatible Bluetooth Devices**](https://github.com/nefarius/ScpToolkit/wiki/Compatible-Bluetooth-Devices)
  * For DS4s to be useable the minimal supported Bluetooth version is **2.1**!
 
 ## Installation How-To

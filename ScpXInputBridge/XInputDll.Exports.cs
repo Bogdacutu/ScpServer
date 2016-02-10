@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using RGiesecke.DllExport;
+#if !EXPERIMENTAL
+using System.Threading;
+using ScpControl.Shared.Core;
+using ScpControl.Shared.Utilities;
+#endif
+using ScpControl.Shared.XInput;
 
 namespace ScpXInputBridge
 {
@@ -38,7 +44,126 @@ namespace ScpXInputBridge
         [DllExport("XInputGetState", CallingConvention.StdCall)]
         public static uint XInputGetState(uint dwUserIndex, ref XINPUT_STATE pState)
         {
+#if !EXPERIMENTAL
             return OriginalXInputGetStateFunction.Value(dwUserIndex, ref pState);
+#else
+            if (OriginalXInputGetStateFunction.Value(dwUserIndex, ref pState) == ResultWin32.ERROR_SUCCESS)
+            {
+                return ResultWin32.ERROR_SUCCESS;
+            }
+
+            try
+            {
+                ScpHidReport report = null;
+
+                while (dwUserIndex == 0 && (report = Proxy.GetReport(dwUserIndex)) == null)
+                {
+                    Thread.Sleep(100);
+                }
+
+                if (report == null || report.PadState != DsState.Connected)
+                {
+                    return ResultWin32.ERROR_DEVICE_NOT_CONNECTED;
+                }
+                
+                var xPad = new XINPUT_GAMEPAD();
+
+                pState.dwPacketNumber = report.PacketCounter;
+
+                switch (report.Model)
+                {
+                    case DsModel.DS3:
+                    {
+                        // select & start
+                        xPad.wButtons |= (ushort) report[Ds3Button.Select].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds3Button.Start].Xbox360Button;
+
+                        // d-pad
+                        xPad.wButtons |= (ushort) report[Ds3Button.Up].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds3Button.Right].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds3Button.Down].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds3Button.Left].Xbox360Button;
+
+                        // shoulders
+                        xPad.wButtons |= (ushort) report[Ds3Button.L1].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds3Button.R1].Xbox360Button;
+
+                        // face buttons
+                        xPad.wButtons |= (ushort) report[Ds3Button.Triangle].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds3Button.Circle].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds3Button.Cross].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds3Button.Square].Xbox360Button;
+
+                        // PS/Guide
+                        xPad.wButtons |= (ushort) report[Ds3Button.Ps].Xbox360Button;
+
+                        // thumbs
+                        xPad.wButtons |= (ushort) report[Ds3Button.L3].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds3Button.R3].Xbox360Button;
+
+                        // triggers
+                        xPad.bLeftTrigger = report[Ds3Axis.L2].Value;
+                        xPad.bRightTrigger = report[Ds3Axis.R2].Value;
+
+                        // thumb axes
+                        xPad.sThumbLX = (short) +DsMath.Scale(report[Ds3Axis.Lx].Value, false);
+                        xPad.sThumbLY = (short) -DsMath.Scale(report[Ds3Axis.Ly].Value, false);
+                        xPad.sThumbRX = (short) +DsMath.Scale(report[Ds3Axis.Rx].Value, false);
+                        xPad.sThumbRY = (short) -DsMath.Scale(report[Ds3Axis.Ry].Value, false);
+                    }
+                        break;
+                    case DsModel.DS4:
+                    {
+                        // select & start
+                        xPad.wButtons |= (ushort) report[Ds4Button.Share].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds4Button.Options].Xbox360Button;
+
+                        // d-pad
+                        xPad.wButtons |= (ushort) report[Ds4Button.Up].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds4Button.Right].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds4Button.Down].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds4Button.Left].Xbox360Button;
+
+                        // shoulders
+                        xPad.wButtons |= (ushort) report[Ds4Button.L1].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds4Button.R1].Xbox360Button;
+
+                        // face buttons
+                        xPad.wButtons |= (ushort) report[Ds4Button.Triangle].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds4Button.Circle].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds4Button.Cross].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds4Button.Square].Xbox360Button;
+
+                        // PS/Guide
+                        xPad.wButtons |= (ushort) report[Ds4Button.Ps].Xbox360Button;
+
+                        // thumbs
+                        xPad.wButtons |= (ushort) report[Ds4Button.L3].Xbox360Button;
+                        xPad.wButtons |= (ushort) report[Ds4Button.R3].Xbox360Button;
+
+                        // triggers
+                        xPad.bLeftTrigger = report[Ds4Axis.L2].Value;
+                        xPad.bRightTrigger = report[Ds4Axis.R2].Value;
+
+                        // thumb axes
+                        xPad.sThumbLX = (short) +DsMath.Scale(report[Ds4Axis.Lx].Value, false);
+                        xPad.sThumbLY = (short) -DsMath.Scale(report[Ds4Axis.Ly].Value, false);
+                        xPad.sThumbRX = (short) +DsMath.Scale(report[Ds4Axis.Rx].Value, false);
+                        xPad.sThumbRY = (short) -DsMath.Scale(report[Ds4Axis.Ry].Value, false);
+                    }
+                        break;
+                }
+
+                pState.Gamepad = xPad;
+            }
+            catch (Exception ex)
+            {
+                Log.ErrorFormat("Unexpected error: {0}", ex);
+                return ResultWin32.ERROR_DEVICE_NOT_CONNECTED;
+            }
+
+            return ResultWin32.ERROR_SUCCESS;
+#endif
         }
 
         /// <summary>
@@ -79,7 +204,46 @@ namespace ScpXInputBridge
         public static uint XInputGetCapabilities(uint dwUserIndex, uint dwFlags,
             ref XINPUT_CAPABILITIES pCapabilities)
         {
+#if !EXPERIMENTAL
             return OriginalXInputGetCapabilitiesFunction.Value(dwUserIndex, dwFlags, ref pCapabilities);
+#else
+
+            Log.DebugFormat("dwUserIndex = {0}", dwUserIndex);
+
+            if (OriginalXInputGetCapabilitiesFunction.Value(dwUserIndex, dwFlags, ref pCapabilities) ==
+                ResultWin32.ERROR_SUCCESS)
+            {
+                return ResultWin32.ERROR_SUCCESS;
+            }
+
+            try
+            {
+                ScpHidReport report = Proxy.GetReport(dwUserIndex);
+                if (report == null || report.PadState != DsState.Connected)
+                {
+                    return ResultWin32.ERROR_DEVICE_NOT_CONNECTED;
+                }
+
+                pCapabilities.Type = XInputConstants.XINPUT_DEVTYPE_GAMEPAD;
+                pCapabilities.SubType = XInputConstants.XINPUT_DEVSUBTYPE_GAMEPAD;
+                pCapabilities.Flags = (ushort) (XInputConstants.CapabilityFlags.XINPUT_CAPS_FFB_SUPPORTED |
+                                                XInputConstants.CapabilityFlags.XINPUT_CAPS_WIRELESS);
+
+                pCapabilities.Gamepad = new XINPUT_GAMEPAD()
+                {
+                    wButtons = 0xFFFF,
+                    bLeftTrigger = 0xFF,
+                    bRightTrigger = 0xFF
+                };
+            }
+            catch (Exception ex)
+            {
+                Log.ErrorFormat("Unexpected error: {0}", ex);
+                return ResultWin32.ERROR_DEVICE_NOT_CONNECTED;
+            }
+
+            return ResultWin32.ERROR_SUCCESS;
+#endif
         }
 
         /// <summary>

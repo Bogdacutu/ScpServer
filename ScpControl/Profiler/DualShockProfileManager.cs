@@ -27,14 +27,18 @@ namespace ScpControl.Profiler
         {
             lock (this)
             {
-                using (var db = new ScpDb())
+                try
                 {
-                    Profiles =
-                        db.Engine.GetAllDbEntities<DualShockProfile>(ScpDb.TableProfiles)
-                            .Select(p => p.Value)
-                            .ToList()
-                            .AsReadOnly();
+                    using (var db = new ScpDb())
+                    {
+                        Profiles =
+                            db.Engine.GetAllDbEntities<DualShockProfile>(ScpDb.TableProfiles)
+                                .Select(p => p.Value)
+                                .ToList()
+                                .AsReadOnly();
+                    }
                 }
+                catch { }
             }
         }
 
@@ -44,9 +48,15 @@ namespace ScpControl.Profiler
         /// <param name="report">The extended HID report.</param>
         public void PassThroughAllProfiles(ScpHidReport report)
         {
-            foreach (var profile in Profiles.Where(p => p.IsActive))
+            try
             {
-                profile.Remap(report);
+                foreach (var profile in Profiles.Where(p => p.IsActive))
+                {
+                    profile.Remap(report);
+                }
+            }
+            catch // TODO: remove!
+            {
             }
         }
 

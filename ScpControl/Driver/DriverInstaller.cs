@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using log4net;
+using ScpControl.Bluetooth;
 using ScpControl.Database;
 using ScpControl.ScpCore;
-using ScpControl.Utilities;
+using ScpControl.Usb.Ds3;
+using ScpControl.Usb.Ds4;
 
 namespace ScpControl.Driver
 {
@@ -15,34 +16,34 @@ namespace ScpControl.Driver
     /// </summary>
     public static class DriverInstaller
     {
+        #region Private static fields
+
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly string DriverDirectory = Path.Combine(GlobalConfiguration.AppDirectory, "Driver");
 
-        public static uint InstallBluetoothDongles(IEnumerable<WdiDeviceInfo> usbDevices, IntPtr hWnd = default(IntPtr),
-            bool force = false)
+        #endregion
+
+        public static WdiErrorCode InstallBluetoothHost(WdiDeviceInfo usbDevice, IntPtr hWnd = default(IntPtr))
         {
-            // install compatible bluetooth dongles
-            var bthDrivers = IniConfig.Instance.BthDongleDriver;
-            uint installed = 0;
+            usbDevice.InfFile = string.Format("BluetoothHost_{0:X4}_{1:X4}.inf", usbDevice.VendorId, usbDevice.ProductId);
+            usbDevice.DeviceType = WdiUsbDeviceType.BluetoothHost;
 
-            foreach (var usbDevice in from usbDevice in usbDevices
-                let result = WdiWrapper.Instance.InstallLibusbKDriver(usbDevice.DeviceId, bthDrivers.DeviceGuid,
-                    DriverDirectory, string.Format("BthDongle_{0}.inf", Guid.NewGuid()), hWnd, force)
-                where result == WdiErrorCode.WDI_SUCCESS
-                select usbDevice)
+            var result = WdiWrapper.InstallWinUsbDriver(usbDevice, BthDongle.DeviceClassGuid, DriverDirectory,
+                usbDevice.InfFile, hWnd);
+
+            if (result != WdiErrorCode.WDI_SUCCESS)
             {
-                usbDevice.DeviceType = WdiUsbDeviceType.BluetoothHost;
-                using (var db = new ScpDb())
-                {
-                    db.Engine.PutDbEntity(ScpDb.TableDevices, usbDevice.DeviceId, usbDevice);
-                }
-
-                installed++;
-                Log.InfoFormat("Installed driver for Bluetooth dongle {0}", usbDevice);
+                Log.ErrorFormat("Installing Bluetooth Host ({0}) failed: {1}", usbDevice.DeviceId, result);
+                return result;
+            }
+            
+            using (var db = new ScpDb())
+            {
+                db.Engine.PutDbEntity(ScpDb.TableDevices, usbDevice.DeviceId, usbDevice);
             }
 
-            return installed;
+            return result;
         }
 
         public static uint UninstallBluetoothDongles(ref bool rebootRequired)
@@ -67,31 +68,27 @@ namespace ScpControl.Driver
             return uninstalled;
         }
 
-        public static uint InstallDualShock3Controllers(IEnumerable<WdiDeviceInfo> usbDevices,
-            IntPtr hWnd = default(IntPtr),
-            bool force = false)
+        public static WdiErrorCode InstallDualShock3Controller(WdiDeviceInfo usbDevice, IntPtr hWnd = default(IntPtr))
         {
-            // install compatible bluetooth dongles
-            var ds3Drivers = IniConfig.Instance.Ds3Driver;
-            uint installed = 0;
+            usbDevice.InfFile = string.Format("Ds3Controller_{0:X4}_{1:X4}.inf", usbDevice.VendorId, usbDevice.ProductId);
+            usbDevice.DeviceType = WdiUsbDeviceType.DualShock3;
 
-            foreach (var usbDevice in from usbDevice in usbDevices
-                let result = WdiWrapper.Instance.InstallLibusbKDriver(usbDevice.DeviceId, ds3Drivers.DeviceGuid,
-                    DriverDirectory, string.Format("Ds3Controller_{0}.inf", Guid.NewGuid()), hWnd, force)
-                where result == WdiErrorCode.WDI_SUCCESS
-                select usbDevice)
+            var result = WdiWrapper.InstallWinUsbDriver(usbDevice, UsbDs3.DeviceClassGuid,
+                DriverDirectory, usbDevice.InfFile, hWnd);
+
+            if (result != WdiErrorCode.WDI_SUCCESS)
             {
-                usbDevice.DeviceType = WdiUsbDeviceType.DualShock3;
-                using (var db = new ScpDb())
-                {
-                    db.Engine.PutDbEntity(ScpDb.TableDevices, usbDevice.DeviceId, usbDevice);
-                }
-
-                installed++;
-                Log.InfoFormat("Installed driver for DualShock 3 controller {0}", usbDevice);
+                Log.ErrorFormat("Installing DualShock 3 Controller ({0}) failed: {1}", usbDevice.DeviceId, result);
+                return result;
             }
 
-            return installed;
+            
+            using (var db = new ScpDb())
+            {
+                db.Engine.PutDbEntity(ScpDb.TableDevices, usbDevice.DeviceId, usbDevice);
+            }
+
+            return result;
         }
 
         public static uint UninstallDualShock3Controllers(ref bool rebootRequired)
@@ -115,32 +112,26 @@ namespace ScpControl.Driver
 
             return uninstalled;
         }
-
-        public static uint InstallDualShock4Controllers(IEnumerable<WdiDeviceInfo> usbDevices,
-            IntPtr hWnd = default(IntPtr),
-            bool force = false)
+        
+        public static WdiErrorCode InstallDualShock4Controller(WdiDeviceInfo usbDevice, IntPtr hWnd = default(IntPtr))
         {
-            // install compatible bluetooth dongles
-            var ds4Drivers = IniConfig.Instance.Ds4Driver;
-            uint installed = 0;
+            usbDevice.InfFile = string.Format("Ds4Controller_{0:X4}_{1:X4}.inf", usbDevice.VendorId, usbDevice.ProductId);
+            usbDevice.DeviceType = WdiUsbDeviceType.DualShock4;
 
-            foreach (var usbDevice in from usbDevice in usbDevices
-                let result = WdiWrapper.Instance.InstallLibusbKDriver(usbDevice.DeviceId, ds4Drivers.DeviceGuid,
-                    DriverDirectory, string.Format("Ds4Controller_{0}.inf", Guid.NewGuid()), hWnd, force)
-                where result == WdiErrorCode.WDI_SUCCESS
-                select usbDevice)
+            var result = WdiWrapper.InstallWinUsbDriver(usbDevice, UsbDs4.DeviceClassGuid, DriverDirectory, usbDevice.InfFile, hWnd);
+
+            if (result != WdiErrorCode.WDI_SUCCESS)
             {
-                usbDevice.DeviceType = WdiUsbDeviceType.DualSHock4;
-                using (var db = new ScpDb())
-                {
-                    db.Engine.PutDbEntity(ScpDb.TableDevices, usbDevice.DeviceId, usbDevice);
-                }
-
-                installed++;
-                Log.InfoFormat("Installed driver for DualShock 4 controller {0}", usbDevice);
+                Log.ErrorFormat("Installing DualShock 4 Controller ({0}) failed: {1}", usbDevice.DeviceId, result);
+                return result;
+            }
+            
+            using (var db = new ScpDb())
+            {
+                db.Engine.PutDbEntity(ScpDb.TableDevices, usbDevice.DeviceId, usbDevice);
             }
 
-            return installed;
+            return result;
         }
 
         public static uint UninstallDualShock4Controllers(ref bool rebootRequired)
