@@ -181,12 +181,12 @@ namespace ScpControl
 
         #region WinUSB wrapper methods
 
-        protected bool ReadIntPipe(byte[] buffer, int length, ref int transfered)
+        protected virtual bool ReadIntPipe(byte[] buffer, int length, ref int transfered)
         {
             return IsActive && Usb.ReadPipe(_winUsbHandle, IntIn, buffer, length, ref transfered, IntPtr.Zero);
         }
 
-        protected bool ReadBulkPipe(byte[] buffer, int length, ref int transfered)
+        protected virtual bool ReadBulkPipe(byte[] buffer, int length, ref int transfered)
         {
             return IsActive && Usb.ReadPipe(_winUsbHandle, BulkIn, buffer, length, ref transfered, IntPtr.Zero);
         }
@@ -196,7 +196,7 @@ namespace ScpControl
             return IsActive && Usb.WritePipe(_winUsbHandle, IntOut, buffer, length, ref transfered, IntPtr.Zero);
         }
 
-        protected bool WriteBulkPipe(byte[] buffer, int length, ref int transfered)
+        protected virtual bool WriteBulkPipe(byte[] buffer, int length, ref int transfered)
         {
             return IsActive && Usb.WritePipe(_winUsbHandle, BulkOut, buffer, length, ref transfered, IntPtr.Zero);
         }
@@ -207,7 +207,7 @@ namespace ScpControl
             return SendTransfer((byte)requestType, (byte)request, value, buffer, ref transfered);
         }
 
-        protected bool SendTransfer(byte requestType, byte request, ushort value, byte[] buffer, ref int transfered)
+        protected virtual bool SendTransfer(byte requestType, byte request, ushort value, byte[] buffer, ref int transfered)
         {
             if (!IsActive) return false;
 

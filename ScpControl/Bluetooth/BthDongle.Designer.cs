@@ -1,6 +1,6 @@
 ﻿namespace ScpControl.Bluetooth
 {
-    sealed partial class BthDongle
+    partial class BthDongle
     {
         /// <summary>
         /// Required designer variable.

@@ -161,6 +161,9 @@
     <Compile Include="Bluetooth\BthHub.Designer.cs">
       <DependentUpon>BthHub.cs</DependentUpon>
     </Compile>
+    <Compile Include="Bluetooth\BthDongleSerial.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Database\DBreezeEngineExtensions.cs" />
     <Compile Include="Database\ScpDb.cs" />
     <Compile Include="Driver\Devcon.cs" />

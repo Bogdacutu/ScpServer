@@ -26,10 +26,15 @@ namespace ScpControl.Bluetooth
                 {
                     if (_device.State != DsState.Connected)
                     {
-                        var arrived = new BthDongle();
+                        BthDongle arrived;
 
-                        if (arrived.Open(path))
-                        {
+                        if (path.StartsWith("COM")) {
+                            arrived = new BthDongleSerial();
+                        } else {
+                            arrived = new BthDongle();
+                        }
+
+                        if (arrived.Open(path)) {
                             Log.DebugFormat("-- Device Arrival [{0}]", arrived.BluetoothHostAddress.AsFriendlyName());
 
                             _device.Close();

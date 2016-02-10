@@ -38,6 +38,7 @@
             this.btnBoth = new System.Windows.Forms.Button();
             this.btnPair = new System.Windows.Forms.Button();
             this.btnOff = new System.Windows.Forms.Button();
+            this.btnBT = new System.Windows.Forms.Button();
             this.btnRight = new System.Windows.Forms.Button();
             this.btnLeft = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
@@ -95,6 +96,7 @@
             this.pnlButton.Controls.Add(this.btnBoth);
             this.pnlButton.Controls.Add(this.btnPair);
             this.pnlButton.Controls.Add(this.btnOff);
+            this.pnlButton.Controls.Add(this.btnBT);
             this.pnlButton.Controls.Add(this.btnRight);
             this.pnlButton.Controls.Add(this.btnLeft);
             this.pnlButton.Controls.Add(this.btnStop);
@@ -153,6 +155,16 @@
             this.btnOff.UseVisualStyleBackColor = true;
             this.btnOff.Click += new System.EventHandler(this.btnMotor_Click);
             this.btnOff.Enter += new System.EventHandler(this.Button_Enter);
+            // 
+            // btnBT
+            // 
+            this.btnBT.Location = new System.Drawing.Point(417, 6);
+            this.btnBT.Name = "btnBT";
+            this.btnBT.Size = new System.Drawing.Size(75, 23);
+            this.btnBT.Text = "BTDongle";
+            this.btnBT.UseVisualStyleBackColor = true;
+            this.btnBT.Click += new System.EventHandler(this.btnBT_Click);
+            this.btnBT.Enter += new System.EventHandler(this.Button_Enter);
             // 
             // btnRight
             // 
@@ -339,6 +351,7 @@
         private System.Windows.Forms.Button btnLeft;
         private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.Button btnStart;
+        private System.Windows.Forms.Button btnBT;
         private System.Windows.Forms.Label lblHost;
         private System.Windows.Forms.Panel pnlDebug;
         private System.Windows.Forms.Panel pnlStatus;

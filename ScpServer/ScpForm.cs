@@ -132,6 +132,11 @@ namespace ScpServer
             }
         }
 
+        private void btnBT_Click(object sender, EventArgs e) {
+            btnBT.Enabled = false;
+            rootHub.Notify(ScpDevice.Notified.Arrival, BthDongle.DeviceClassGuid.ToString(), "COMBTD");
+        }
+
         protected void btnDisconnect_Click(object sender, EventArgs e)
         {
             for (var index = 0; index < Pad.Length; index++)
